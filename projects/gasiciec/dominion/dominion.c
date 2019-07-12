@@ -868,55 +868,7 @@ int cardEffect(int card, int choice1, int choice2, int choice3, struct gameState
 
     case minion:
       //Call minion function
-
-      //+1 action
-      state->numActions++;
-
-      //discard card from hand
-      discardCard(handPos, currentPlayer, state, 0);
-
-      if (choice1)		//+2 coins
-	{
-	  state->coins = state->coins + 2;
-	}
-
-      else if (choice2)		//discard hand, redraw 4, other players with 5+ cards discard hand and draw 4
-	{
-	  //discard hand
-	  while(numHandCards(state) > 0)
-	    {
-	      discardCard(handPos, currentPlayer, state, 0);
-	    }
-
-	  //draw 4
-	  for (i = 0; i < 4; i++)
-	    {
-	      drawCard(currentPlayer, state);
-	    }
-
-	  //other players discard hand and redraw if hand size > 4
-	  for (i = 0; i < state->numPlayers; i++)
-	    {
-	      if (i != currentPlayer)
-		{
-		  if ( state->handCount[i] > 4 )
-		    {
-		      //discard hand
-		      while( state->handCount[i] > 0 )
-			{
-			  discardCard(handPos, i, state, 0);
-			}
-
-		      //draw 4
-		      for (j = 0; j < 4; j++)
-			{
-			  drawCard(i, state);
-			}
-		    }
-		}
-	    }
-
-	}
+      playMinion(state, currentPlayer, handPos);
       return 0;
 
     case steward:
@@ -1288,7 +1240,7 @@ int updateCoins(int player, struct gameState *state, int bonus)
 
 
 /******************************************************************************
-* * Description:  baron() -- increases the number of buys and discards an
+* * Description:  playBaron() -- increases the number of buys and discards an
 * *               estate if the player has chosen to do so and if one is
 * *               available to discard.  If the estate is discarded, 4 coins
 * *               are added to the player's cards, the discard count is
@@ -1368,7 +1320,7 @@ void playBaron(int choice1, int currentPlayer, struct gameState *state)
 
 
 /******************************************************************************
-* * DESCRIPTION:  gainEstate -- adds estate card to player's hand, decrements
+* * DESCRIPTION:  gainEstate() -- adds estate card to player's hand, decrements
 * *               number of estates, and checks to see if the game is over if
 * *               no estates remain
 ******************************************************************************/
@@ -1387,60 +1339,80 @@ void gainEstate(struct gameState *state, int currentPlayer)
 
 
 /******************************************************************************
-* * DESCRIPTION:  playMinion --
-* *
-* *
+* * DESCRIPTION:  playMinion() -- increments the number of actions, then discards
+* *               the played card.  Coins are increased by 2 if player has
+* *               chosen this option.  If not, the player's hand is discarded,
+* *               four new cards are drawn for the player, and all other players'
+* *               hands are checked for more than four cards.  If they have more
+* *               than four, their hand is discarded and replaced with four
+* *               new cards.
 ******************************************************************************/
 void playMinion(struct gameState *state, int currentPlayer, int handPos)
 {
+  //Iterator for loops
+  int i;
+
   //+1 action
   state->numActions++;
 
   //discard card from hand
   discardCard(handPos, currentPlayer, state, 0);
 
-  if (choice1)		//+2 coins
+  //Player choses to gain 2 coins
+  if (choice1)
   {
     state->coins = state->coins + 2;
   }
 
-  else if (choice2)		//discard hand, redraw 4, other players with 5+ cards discard hand and draw 4
-{
-//discard hand
-while(numHandCards(state) > 0)
+  //discard hand, redraw 4, other players with 5+ cards discard hand and draw 4
+  else if (choice2)
   {
-    discardCard(handPos, currentPlayer, state, 0);
-  }
-
-//draw 4
-for (i = 0; i < 4; i++)
-  {
-    drawCard(currentPlayer, state);
-  }
-
-//other players discard hand and redraw if hand size > 4
-for (i = 0; i < state->numPlayers; i++)
-  {
-    if (i != currentPlayer)
-{
-  if ( state->handCount[i] > 4 )
+    //discard hand
+    while(numHandCards(state) > 0)
     {
-      //discard hand
-      while( state->handCount[i] > 0 )
-  {
-    discardCard(handPos, i, state, 0);
-  }
-
-      //draw 4
-      for (j = 0; j < 4; j++)
-  {
-    drawCard(i, state);
-  }
+      discardCard(handPos, currentPlayer, state, 0);
     }
-}
-  }
 
+    //draw 4
+    for (i = 0; i < 4; i++)
+    {
+      drawCard(currentPlayer, state);
+    }
+
+    //other players discard hand and redraw if hand size > 4
+    for (i = 0; i < state->numPlayers; i++)
+    {
+      if (i != currentPlayer)
+      {
+        if ( state->handCount[i] > 4 )
+        {
+          //discard hand
+          while( state->handCount[i] > 0 )
+          {
+            discardCard(handPos, i, state, 0);
+          }
+
+          //draw 4
+          for (j = 0; j < 4; j++)
+          {
+            drawCard(i, state);
+          }
+        }
+      }
+    }
+  }
 }
-}
+
+
+
+
+/******************************************************************************
+* * Description:  playAmbassador() --
+* *
+* *
+* *
+* *
+* *
+******************************************************************************/
 
 //end of dominion.c
