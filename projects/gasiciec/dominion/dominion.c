@@ -868,7 +868,7 @@ int cardEffect(int card, int choice1, int choice2, int choice3, struct gameState
 
     case minion:
       //Call minion function
-      playMinion(state, currentPlayer, handPos);
+      playMinion(choice1, choice2, state, currentPlayer, handPos);
       return 0;
 
     case steward:
@@ -954,62 +954,7 @@ int cardEffect(int card, int choice1, int choice2, int choice3, struct gameState
       return 0;
 
     case ambassador:
-      j = 0;		//used to check if player has enough cards to discard
-
-      if (choice2 > 2 || choice2 < 0)
-	{
-	  return -1;
-	}
-
-      if (choice1 == handPos)
-	{
-	  return -1;
-	}
-
-      for (i = 0; i < state->handCount[currentPlayer]; i++)
-	{
-	  if (i != handPos && i == state->hand[currentPlayer][choice1] && i != choice1)
-	    {
-	      j++;
-	    }
-	}
-      if (j < choice2)
-	{
-	  return -1;
-	}
-
-      if (DEBUG)
-	printf("Player %d reveals card number: %d\n", currentPlayer, state->hand[currentPlayer][choice1]);
-
-      //increase supply count for choosen card by amount being discarded
-      state->supplyCount[state->hand[currentPlayer][choice1]] += choice2;
-
-      //each other player gains a copy of revealed card
-      for (i = 0; i < state->numPlayers; i++)
-	{
-	  if (i != currentPlayer)
-	    {
-	      gainCard(state->hand[currentPlayer][choice1], state, 0, i);
-	    }
-	}
-
-      //discard played card from hand
-      discardCard(handPos, currentPlayer, state, 0);
-
-      //trash copies of cards returned to supply
-      for (j = 0; j < choice2; j++)
-	{
-	  for (i = 0; i < state->handCount[currentPlayer]; i++)
-	    {
-	      if (state->hand[currentPlayer][i] == state->hand[currentPlayer][choice1])
-		{
-		  discardCard(i, currentPlayer, state, 1);
-		  break;
-		}
-	    }
-	}
-
-      return 0;
+      return playAmbassador(choice1, choice2, state, handPos, currentPlayer);
 
     case cutpurse:
 
@@ -1347,10 +1292,10 @@ void gainEstate(struct gameState *state, int currentPlayer)
 * *               than four, their hand is discarded and replaced with four
 * *               new cards.
 ******************************************************************************/
-void playMinion(struct gameState *state, int currentPlayer, int handPos)
+void playMinion(int choice1, int choice2, struct gameState *state, int currentPlayer, int handPos)
 {
-  //Iterator for loops
-  int i;
+  //Iterators for loops
+  int i, j;
 
   //+1 action
   state->numActions++;
@@ -1414,5 +1359,77 @@ void playMinion(struct gameState *state, int currentPlayer, int handPos)
 * *
 * *
 ******************************************************************************/
+int playAmbassador(int choice1, int choice2, struct gameState *state, int handPos, int currentPlayer)
+{
+  //used to check if player has enough cards to discard
+  int j = 0;
 
+  //Iterator for loops
+  int i = 0;
+
+  //Make sure player didn't pick illegal number of cards
+  if (choice2 > 2 || choice2 < 0)
+  {
+    return -1;
+  }
+
+  //Make sure player didn't choose this card
+  if (choice1 == handPos)
+  {
+    return -1;
+  }
+
+  //Search player's hand for copies of card
+  for (i = 0; i < state->handCount[currentPlayer]; i++)
+  {
+    /* If not ambassador, card matches chosen card to discard, and card is not
+      the chosen card itself, increment number of copies found */
+    if (i != handPos && i == state->hand[currentPlayer][choice1] && i != choice1)
+    {
+      j++;
+    }
+  }
+
+  //Check that there are enough cards to match player's choice
+  if (j < choice2)
+  {
+    return -1;
+  }
+
+  //Show card chosen by player
+  if (DEBUG)
+  {
+    printf("Player %d reveals card number: %d\n", currentPlayer, state->hand[currentPlayer][choice1]);
+  }
+
+  //increase supply count for choosen card by amount being discarded
+  state->supplyCount[state->hand[currentPlayer][choice1]] += choice2;
+
+  //each other player gains a copy of revealed card
+  for (i = 0; i < state->numPlayers; i++)
+  {
+    if (i != currentPlayer)
+    {
+      gainCard(state->hand[currentPlayer][choice1], state, 0, i);
+    }
+  }
+
+  //discard played card from hand
+  discardCard(handPos, currentPlayer, state, 0);
+
+  //trash copies of cards returned to supply
+  for (j = 0; j < choice2; j++)
+  {
+    for (i = 0; i < state->handCount[currentPlayer]; i++)
+    {
+      if (state->hand[currentPlayer][i] == state->hand[currentPlayer][choice1])
+      {
+        discardCard(i, currentPlayer, state, 1);
+        break;
+      }
+    }
+  }
+
+  return 0;
+}
 //end of dominion.c
