@@ -653,7 +653,7 @@ int cardEffect(int card, int choice1, int choice2, int choice3, struct gameState
   int currentPlayer = whoseTurn(state);
   int nextPlayer = currentPlayer + 1;
 
-  int tributeRevealedCards[2] = {-1, -1};
+
   int temphand[MAX_HAND];// moved above the if statement
   int drawntreasure=0;
   int cardDrawn;
@@ -895,62 +895,7 @@ int cardEffect(int card, int choice1, int choice2, int choice3, struct gameState
       return 0;
 
     case tribute:
-      if ((state->discardCount[nextPlayer] + state->deckCount[nextPlayer]) <= 1){
-	if (state->deckCount[nextPlayer] > 0){
-	  tributeRevealedCards[0] = state->deck[nextPlayer][state->deckCount[nextPlayer]-1];
-	  state->deckCount[nextPlayer]--;
-	}
-	else if (state->discardCount[nextPlayer] > 0){
-	  tributeRevealedCards[0] = state->discard[nextPlayer][state->discardCount[nextPlayer]-1];
-	  state->discardCount[nextPlayer]--;
-	}
-	else{
-	  //No Card to Reveal
-	  if (DEBUG){
-	    printf("No cards to reveal\n");
-	  }
-	}
-      }
-
-      else{
-	if (state->deckCount[nextPlayer] == 0){
-	  for (i = 0; i < state->discardCount[nextPlayer]; i++){
-	    state->deck[nextPlayer][i] = state->discard[nextPlayer][i];//Move to deck
-	    state->deckCount[nextPlayer]++;
-	    state->discard[nextPlayer][i] = -1;
-	    state->discardCount[nextPlayer]--;
-	  }
-
-	  shuffle(nextPlayer,state);//Shuffle the deck
-	}
-	tributeRevealedCards[0] = state->deck[nextPlayer][state->deckCount[nextPlayer]-1];
-	state->deck[nextPlayer][state->deckCount[nextPlayer]--] = -1;
-	state->deckCount[nextPlayer]--;
-	tributeRevealedCards[1] = state->deck[nextPlayer][state->deckCount[nextPlayer]-1];
-	state->deck[nextPlayer][state->deckCount[nextPlayer]--] = -1;
-	state->deckCount[nextPlayer]--;
-      }
-
-      if (tributeRevealedCards[0] == tributeRevealedCards[1]){//If we have a duplicate card, just drop one
-	state->playedCards[state->playedCardCount] = tributeRevealedCards[1];
-	state->playedCardCount++;
-	tributeRevealedCards[1] = -1;
-      }
-
-      for (i = 0; i <= 2; i ++){
-	if (tributeRevealedCards[i] == copper || tributeRevealedCards[i] == silver || tributeRevealedCards[i] == gold){//Treasure cards
-	  state->coins += 2;
-	}
-
-	else if (tributeRevealedCards[i] == estate || tributeRevealedCards[i] == duchy || tributeRevealedCards[i] == province || tributeRevealedCards[i] == gardens || tributeRevealedCards[i] == great_hall){//Victory Card Found
-	  drawCard(currentPlayer, state);
-	  drawCard(currentPlayer, state);
-	}
-	else{//Action Card
-	  state->numActions = state->numActions + 2;
-	}
-      }
-
+      playTribute(state, nextPlayer, currentPlayer);
       return 0;
 
     case ambassador:
@@ -1432,4 +1377,130 @@ int playAmbassador(int choice1, int choice2, struct gameState *state, int handPo
 
   return 0;
 }
+
+
+
+/******************************************************************************
+* * Description:  playTribute() --
+* *
+* *
+* *
+* *
+* *
+******************************************************************************/
+void playTribute(struct gameState *state, int nextPlayer, int currentPlayer)
+{
+    //For storing revealed cards
+    int tributeRevealedCards[2] = {-1, -1};
+
+    //Iterator for loops
+    int i;
+
+    //Check next player's deck and discard pile for 1 or fewer cards
+    if ((state->discardCount[nextPlayer] + state->deckCount[nextPlayer]) <= 1)
+    {
+      //Next player has 1 card in their deck
+      if (state->deckCount[nextPlayer] > 0)
+      {
+        //Add this card to array of cards revealed by tribute
+        tributeRevealedCards[0] = state->deck[nextPlayer][state->deckCount[nextPlayer]-1];
+        //Decrement number of cards in player's deck
+        state->deckCount[nextPlayer]--;
+      }
+
+      //Next player has no cards in their deck but 1 in their discard
+      else if (state->discardCount[nextPlayer] > 0)
+      {
+        //Add this card to revealed cards
+        tributeRevealedCards[0] = state->discard[nextPlayer][state->discardCount[nextPlayer]-1];
+        //Decrement cards in discard pile
+        state->discardCount[nextPlayer]--;
+      }
+
+      //No Card to Reveal
+      else{
+        if (DEBUG)
+        {
+          printf("No cards to reveal\n");
+        }
+      }
+  }
+
+
+  //Next player has more than 1 card in deck and discard
+  else
+  {
+    //Next player's deck is empty
+    if (state->deckCount[nextPlayer] == 0)
+    {
+      //Refill next player's deck with discards
+      for (i = 0; i < state->discardCount[nextPlayer]; i++)
+      {
+        //Move to deck
+        state->deck[nextPlayer][i] = state->discard[nextPlayer][i];
+        state->deckCount[nextPlayer]++;
+        state->discard[nextPlayer][i] = -1;
+        state->discardCount[nextPlayer]--;
+      }
+
+      //Shuffle the deck
+      shuffle(nextPlayer,state);
+    }
+
+    //Add topmost card to revealed pile
+    tributeRevealedCards[0] = state->deck[nextPlayer][state->deckCount[nextPlayer]-1];
+    //Remove card from the deck
+    state->deck[nextPlayer][state->deckCount[nextPlayer]--] = -1;
+    state->deckCount[nextPlayer]--;
+
+    //Add next card to revealed pile and remove from deck
+    tributeRevealedCards[1] = state->deck[nextPlayer][state->deckCount[nextPlayer]-1];
+    state->deck[nextPlayer][state->deckCount[nextPlayer]--] = -1;
+    state->deckCount[nextPlayer]--;
+  }
+
+  //If we have a duplicate card, just drop one
+  if (tributeRevealedCards[0] == tributeRevealedCards[1])
+  {
+    //Add last revealed card to played cards pile
+    state->playedCards[state->playedCardCount] = tributeRevealedCards[1];
+    state->playedCardCount++;
+    //Remove card from revealed pile
+    tributeRevealedCards[1] = -1;
+  }
+
+  //Search revealed pile
+  for (i = 0; i <= 2; i ++)
+  {
+    //Treasure cards
+    if (tributeRevealedCards[i] == copper || tributeRevealedCards[i] == silver || tributeRevealedCards[i] == gold)
+    {
+      state->coins += 2;
+    }
+
+    //Victory Card Found
+    else if (tributeRevealedCards[i] == estate || tributeRevealedCards[i] == duchy || tributeRevealedCards[i] == province || tributeRevealedCards[i] == gardens || tributeRevealedCards[i] == great_hall)
+    {
+      drawCard(currentPlayer, state);
+      drawCard(currentPlayer, state);
+    }
+
+    //Action Card
+    else
+    {
+      state->numActions = state->numActions + 2;
+    }
+  }
+}
+
+
+
+/******************************************************************************
+* * Description:  playMine() --
+* *
+* *
+* *
+* *
+* *
+******************************************************************************/
 //end of dominion.c
