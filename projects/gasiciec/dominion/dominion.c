@@ -868,7 +868,7 @@ int cardEffect(int card, int choice1, int choice2, int choice3, struct gameState
 
     case minion:
       //Call minion function
-      
+
       //+1 action
       state->numActions++;
 
@@ -1387,7 +1387,7 @@ void gainEstate(struct gameState *state, int currentPlayer)
 
 
 /******************************************************************************
-* * DESCRIPTION:  minion --
+* * DESCRIPTION:  playMinion --
 * *
 * *
 ******************************************************************************/
