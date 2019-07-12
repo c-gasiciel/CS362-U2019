@@ -768,39 +768,7 @@ int cardEffect(int card, int choice1, int choice2, int choice3, struct gameState
       return -1;
 
     case mine:
-      j = state->hand[currentPlayer][choice1];  //store card we will trash
-
-      if (state->hand[currentPlayer][choice1] < copper || state->hand[currentPlayer][choice1] > gold)
-	{
-	  return -1;
-	}
-
-      if (choice2 > treasure_map || choice2 < curse)
-	{
-	  return -1;
-	}
-
-      if ( (getCost(state->hand[currentPlayer][choice1]) + 3) > getCost(choice2) )
-	{
-	  return -1;
-	}
-
-      gainCard(choice2, state, 2, currentPlayer);
-
-      //discard card from hand
-      discardCard(handPos, currentPlayer, state, 0);
-
-      //discard trashed card
-      for (i = 0; i < state->handCount[currentPlayer]; i++)
-	{
-	  if (state->hand[currentPlayer][i] == j)
-	    {
-	      discardCard(i, currentPlayer, state, 0);
-	      break;
-	    }
-	}
-
-      return 0;
+      return playMine(choice1, choice2, state, currentPlayer, handPos);
 
     case remodel:
       j = state->hand[currentPlayer][choice1];  //store card we will trash
@@ -1381,12 +1349,12 @@ int playAmbassador(int choice1, int choice2, struct gameState *state, int handPo
 
 
 /******************************************************************************
-* * Description:  playTribute() --
-* *
-* *
-* *
-* *
-* *
+* * Description:  playTribute() --  allows the player to have the player on
+* * their left reveal and discard the top two cards from their deck. For each
+* * card that is different, the player receives a bonus. If the revealed card
+* * was an Action, the player gets two extra actions. If it was Treasure, the
+* * player receives two Treasure. If it was a Victory Card, the player gets to
+* * draw two extra cards.
 ******************************************************************************/
 void playTribute(struct gameState *state, int nextPlayer, int currentPlayer)
 {
@@ -1433,18 +1401,7 @@ void playTribute(struct gameState *state, int nextPlayer, int currentPlayer)
     //Next player's deck is empty
     if (state->deckCount[nextPlayer] == 0)
     {
-      //Refill next player's deck with discards
-      for (i = 0; i < state->discardCount[nextPlayer]; i++)
-      {
-        //Move to deck
-        state->deck[nextPlayer][i] = state->discard[nextPlayer][i];
-        state->deckCount[nextPlayer]++;
-        state->discard[nextPlayer][i] = -1;
-        state->discardCount[nextPlayer]--;
-      }
-
-      //Shuffle the deck
-      shuffle(nextPlayer,state);
+        moveDiscardToDeck(state, nextPlayer);
     }
 
     //Add topmost card to revealed pile
@@ -1496,11 +1453,79 @@ void playTribute(struct gameState *state, int nextPlayer, int currentPlayer)
 
 
 /******************************************************************************
-* * Description:  playMine() --
-* *
-* *
-* *
-* *
-* *
+* * Description:  moveDiscardToDeck() -- moves the player's discard pile
+* *               to their deck and shuffles
 ******************************************************************************/
+void moveDiscardToDeck(struct gameState *state, int player)
+{
+  int i;
+
+  //Refill next player's deck with discards
+  for (i = 0; i < state->discardCount[player]; i++)
+  {
+    //Move to deck
+    state->deck[player][i] = state->discard[player][i];
+    state->deckCount[player]++;
+    state->discard[player][i] = -1;
+    state->discardCount[player]--;
+  }
+
+  //Shuffle the deck
+  shuffle(player,state);
+}
+
+
+
+/******************************************************************************
+* * Description:  playMine() -- allows a user to trash a Treasure to gain a
+* *               Treasure that costs up to 3 more than the trashed Treasure card
+******************************************************************************/
+int playMine(int choice1, int choice2, struct gameState *state, int currentPlayer, int handPos)
+{
+  //Iterator for loop
+  int i;
+
+  //store card we will trash
+  int j = state->hand[currentPlayer][choice1];
+
+  //User has not chosen a Treasure to trash
+  if (state->hand[currentPlayer][choice1] < copper || state->hand[currentPlayer][choice1] > gold)
+  {
+    return -1;
+  }
+
+  //Supply number is invalid
+  if (choice2 > treasure_map || choice2 < curse)
+  {
+    return -1;
+  }
+
+  //Cost of card to trash + 3 is greater than cost of Treasure to gain
+  if ((getCost(state->hand[currentPlayer][choice1]) + 3) > getCost(choice2))
+  {
+    return -1;
+  }
+
+  //Gain new Treasure
+  gainCard(choice2, state, 2, currentPlayer);
+
+  //discard Mine from hand
+  discardCard(handPos, currentPlayer, state, 0);
+
+  //discard trashed card
+  for (i = 0; i < state->handCount[currentPlayer]; i++)
+  {
+    //If this is the card to discard, discard it and break from loop
+    if (state->hand[currentPlayer][i] == j)
+    {
+      discardCard(i, currentPlayer, state, 0);
+      break;
+    }
+  }
+
+  return 0;
+}
+
+
+
 //end of dominion.c

@@ -137,4 +137,8 @@ void playMinion(int choice1, int choice2, struct gameState *state, int currentPl
 int playAmbassador(int choice1, int choice2, struct gameState *state, int handPos, int currentPlayer);
 
 void playTribute(struct gameState *state, int nextPlayer, int currentPlayer);
+
+void moveDiscardToDeck(struct gameState *state, int player);
+
+int playMine(int choice1, int choice2, struct gameState *state, int currentPlayer, int handPos);
 #endif
