@@ -1520,7 +1520,6 @@ int playMine(int choice1, int choice2, struct gameState *state, int currentPlaye
     if (state->hand[currentPlayer][i] == j)
     {
       discardCard(i, currentPlayer, state, 0);
-      break;
     }
   }
 
