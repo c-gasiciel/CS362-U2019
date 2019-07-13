@@ -1315,9 +1315,6 @@ int playAmbassador(int choice1, int choice2, struct gameState *state, int handPo
     printf("Player %d reveals card number: %d\n", currentPlayer, state->hand[currentPlayer][choice1]);
   }
 
-  //increase supply count for choosen card by amount being discarded
-  state->supplyCount[state->hand[currentPlayer][choice1]] += choice2;
-
   //each other player gains a copy of revealed card
   for (i = 0; i < state->numPlayers; i++)
   {
@@ -1326,6 +1323,10 @@ int playAmbassador(int choice1, int choice2, struct gameState *state, int handPo
       gainCard(state->hand[currentPlayer][choice1], state, 0, i);
     }
   }
+
+  //increase supply count for choosen card by amount being discarded
+  state->supplyCount[state->hand[currentPlayer][choice1]] += choice2;
+
 
   //discard played card from hand
   discardCard(handPos, currentPlayer, state, 0);
@@ -1405,7 +1406,7 @@ void playTribute(struct gameState *state, int nextPlayer, int currentPlayer)
     }
 
     //Add topmost card to revealed pile
-    tributeRevealedCards[0] = state->deck[nextPlayer][state->deckCount[nextPlayer]-1];
+    tributeRevealedCards[0] = state->deck[nextPlayer][state->deckCount[nextPlayer]];
     //Remove card from the deck
     state->deck[nextPlayer][state->deckCount[nextPlayer]--] = -1;
     state->deckCount[nextPlayer]--;
