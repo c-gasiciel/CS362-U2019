@@ -1123,10 +1123,11 @@ void playBaron(int choice1, int currentPlayer, struct gameState *state)
       if (state->hand[currentPlayer][p] == estate){
         //Add 4 coins to the amount of coins
         state->coins += 4;
-        //Add estate to discard pile
-        state->discard[currentPlayer][state->discardCount[currentPlayer]] = state->hand[currentPlayer][p];
         //Increment discard count
         state->discardCount[currentPlayer]++;
+        //Add estate to discard pile
+        state->discard[currentPlayer][state->discardCount[currentPlayer]] = state->hand[currentPlayer][p];
+
 
         //Remove estate from hand
         for (;p < state->handCount[currentPlayer]; p++){
