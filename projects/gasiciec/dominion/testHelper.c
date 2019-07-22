@@ -13,12 +13,12 @@ void assertTrue(int isTrue)
 {
   if(isTrue)
   {
-      printf("Passed\n");
+      printf("Passed\n\n");
   }
 
   else
   {
-    printf("Failed\n");
+    printf("Failed\n\n");
   }
 }
 
