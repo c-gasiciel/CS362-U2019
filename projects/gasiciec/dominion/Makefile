@@ -9,14 +9,22 @@ dominion.o: dominion.h dominion.c rngs.o
 testHelper.o: testHelper.h testHelper.c dominion.o
 	gcc -c testHelper.c -g  $(CFLAGS)
 
-unittest1: unittest1.c dominion.o rngs.o testHelper.o
-	gcc -o unittest1 unittest1.c dominion.o rngs.o testHelper.o  $(CFLAGS)
+randomtestcard1: randomtestcard1.c dominion.o rngs.o testHelper.o
+	gcc -o randomtestcard1 randomtestcard1.c dominion.o rngs.o testHelper.o  $(CFLAGS)
 
-unittest2: unittest2.c dominion.o rngs.o testHelper.o
-	gcc -o unittest2 unittest2.c dominion.o rngs.o testHelper.o $(CFLAGS)
+randomtestcard2: randomtestcard2.c dominion.o rngs.o testHelper.o
+	gcc -o randomtestcard2 randomtestcard2.c dominion.o rngs.o testHelper.o $(CFLAGS)
 
-unittest3: unittest3.c dominion.o rngs.o testHelper.o
-	gcc -o unittest3 unittest3.c dominion.o rngs.o testHelper.o $(CFLAGS)
+randomtestcard3: randomtestcard3.c dominion.o rngs.o testHelper.o
+	gcc -o randomtestcard3 randomtestcard3.c dominion.o rngs.o testHelper.o $(CFLAGS)
+
+randomtestresults: randomtestcard1	randomtestcard2 randomtestcard3
+	./randomtestcard1 &> randomtestresults.out
+	gcov dominion.c >> randomtestresults.out
+	./randomtestcard2 &> randomtestresults.out
+	gcov dominion.c >> randomtestresults.out
+	./randomtestcard3 &> randomtestresults.out
+	gcov dominion.c >> randomtestresults.out 
 
 playdom: dominion.o playdom.c
 	gcc -o playdom playdom.c -g dominion.o rngs.o $(CFLAGS)
