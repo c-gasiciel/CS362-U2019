@@ -9,16 +9,18 @@
 /******************************************************************************
 * * DESCRIPTION:  assertTrue() -- checks if test has been passed
 ******************************************************************************/
-void assertTrue(int isTrue)
+int assertTrue(int isTrue)
 {
   if(isTrue)
   {
       printf("Passed\n\n");
+      return 1;
   }
 
   else
   {
     printf("Failed\n\n");
+    return 0;
   }
 }
 
@@ -37,7 +39,7 @@ int searchHand(struct gameState *state, int val, int currPlayer, int *pos)
   for(i = 0; i < state->handCount[currPlayer]; i++)
   {
     //If card found, record position and return true
-    if(state->hand[currPlayer][i] == val);
+    if(state->hand[currPlayer][i] == val)
     {
       *pos = i;
       return 1;

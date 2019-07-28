@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include "dominion.h"
 
-void assertTrue(int isTrue);
+int assertTrue(int isTrue);
 int searchHand(struct gameState *state, int val, int currPlayer, int *pos);
 void removeCards(struct gameState *state, int rmVal, int currPlayer, int rpVal);
 int searchDiscard(struct gameState *state, int val, int currPlayer, int *pos);
