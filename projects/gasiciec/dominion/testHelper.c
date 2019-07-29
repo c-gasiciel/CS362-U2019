@@ -96,3 +96,93 @@ void removeCards(struct gameState *state, int rmVal, int currPlayer, int rpVal)
     }
   }
 }
+
+
+
+
+/******************************************************************************
+* * DESCRIPTION:  randomizeHand() -- fills hand with random cards
+* *
+*****************************************************************************/
+void randomizeHand(struct gameState *state, int currPlayer)
+{
+  int i;
+
+  for(i = 0; i < state->handCount[currPlayer]; i++)
+  {
+    int isAvailable = 0;
+
+    while(!isAvailable)
+    {
+      //Pick random card
+      int pickCard = floor(Random() * treasure_map);
+
+      //If card is in game, add to hand
+      if(state->supplyCount[pickCard] != -1)
+      {
+        state->hand[currPlayer][i] = pickCard;
+        isAvailable = 1;
+      }
+    }
+  }
+}
+
+
+
+
+/******************************************************************************
+* * DESCRIPTION:  randomizeDeck() -- fills hand with random cards
+* *
+*****************************************************************************/
+void randomizeDeck(struct gameState *state, int currPlayer)
+{
+  int i;
+
+  for(i = 0; i < state->deckCount[currPlayer]; i++)
+  {
+    int isAvailable = 0;
+
+    while(!isAvailable)
+    {
+      //Pick random card
+      int pickCard = floor(Random() * treasure_map);
+
+      //If card is in game, add to hand
+      if(state->supplyCount[pickCard] != -1)
+      {
+        state->deck[currPlayer][i] = pickCard;
+        isAvailable = 1;
+      }
+    }
+  }
+}
+
+
+
+
+/******************************************************************************
+* * DESCRIPTION:  randomizeDiscard() -- fills hand with random cards
+* *
+*****************************************************************************/
+void randomizeDiscard(struct gameState *state, int currPlayer)
+{
+  int i;
+
+  for(i = 0; i < state->discardCount[currPlayer]; i++)
+  {
+    int isAvailable = 0;
+
+    while(!isAvailable)
+    {
+      //Pick random card
+      int pickCard = floor(Random() * treasure_map);
+
+      //If card is in game, add to hand
+      if(state->supplyCount[pickCard] != -1)
+      {
+        state->discard[currPlayer][i] = pickCard;
+        isAvailable = 1;
+      }
+    }
+  }
+}

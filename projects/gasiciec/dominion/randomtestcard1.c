@@ -171,7 +171,7 @@ int main()
 
     //Set current player to random player
     int currPlayer = floor(Random() * TestGame.numPlayers);
-    //printf("Current Player: %d\n\n", currPlayer);
+    /*printf("Current Player: %d\n\n", currPlayer); */
 
 
     //Set number of Actions = 1 as each turn should start this way

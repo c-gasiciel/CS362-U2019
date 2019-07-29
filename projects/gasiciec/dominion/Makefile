@@ -6,7 +6,7 @@ rngs.o: rngs.h rngs.c
 dominion.o: dominion.h dominion.c rngs.o
 	gcc -c dominion.c -g  $(CFLAGS)
 
-testHelper.o: testHelper.h testHelper.c dominion.o
+testHelper.o: testHelper.h testHelper.c dominion.o rngs.o
 	gcc -c testHelper.c -g  $(CFLAGS)
 
 randomtestcard1: randomtestcard1.c dominion.o rngs.o testHelper.o

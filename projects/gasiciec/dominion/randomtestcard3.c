@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include "rngs.h"
 #include "testHelper.h"
+#include <math.h>
 
 #define TESTCARD "tribute"
 
